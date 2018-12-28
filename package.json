@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "elastic-apm-node": "^2.0.6",
+    "node-tailor": "^3.9.2"
+  }
+}
