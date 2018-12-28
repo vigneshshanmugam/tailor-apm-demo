@@ -1,9 +1,10 @@
 "use strict";
 
 const agent = require("elastic-apm-node").start({
-  serviceName: "tailor"
+  serviceName: "tailor",
+  logger: console
 });
-// const { Tracer } = require("elastic-apm-node/opentracing");
+const { Tracer } = require("elastic-apm-node/opentracing");
 const http = require("http");
 const Tailor = require("node-tailor");
 const serveFragment = require("./fragment");
@@ -17,7 +18,8 @@ const tailor = new Tailor({
     return { timingGroups, id, primary: !!(primary || primary === "") };
   },
   pipeInstanceName: "TailorPipe",
-  maxAssetLinks: 3
+  maxAssetLinks: 3,
+  tracer: new Tracer(agent)
 });
 const server = http.createServer((req, res) => {
   if (req.url === "/favicon.ico") {
