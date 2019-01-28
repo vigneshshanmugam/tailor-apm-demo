@@ -4,7 +4,7 @@ const agent = require("elastic-apm-node").start({
   serviceName: "tailor",
   logger: console
 });
-const { Tracer } = require("elastic-apm-node/opentracing");
+const Tracer = require("elastic-apm-node-opentracing");
 const http = require("http");
 const Tailor = require("node-tailor");
 const serveFragment = require("./fragment");
