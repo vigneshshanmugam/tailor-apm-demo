@@ -1,13 +1,16 @@
 "use strict";
 
 const agent = require("elastic-apm-node").start({
-  serviceName: "tailor",
-  logger: console
+  serviceName: "tailor-backend",
+  logLevel: "error",
+  disableInstrumentations: ["http"],
+  captureSpanStackTraces: false
 });
 const Tracer = require("elastic-apm-node-opentracing");
 const http = require("http");
 const Tailor = require("node-tailor");
 const serveFragment = require("./fragment");
+const handleTag = require("./handle-tags");
 
 const tailor = new Tailor({
   templatesPath: __dirname + "/templates",
@@ -20,12 +23,15 @@ const tailor = new Tailor({
   },
   pipeInstanceName: "TailorPipe",
   maxAssetLinks: 3,
-  tracer: new Tracer(agent)
+  tracer: new Tracer(agent),
+  handleTag,
+  handledTags: ["fragment", "apm-rum"]
 });
 
 /** Tailor Server */
 http
   .createServer((req, res) => {
+    agent.setTransactionName(req.url);
     if (req.url === "/favicon.ico") {
       res.writeHead(200, { "Content-Type": "image/x-icon" });
       return res.end("");

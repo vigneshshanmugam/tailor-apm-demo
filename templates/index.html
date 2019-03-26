@@ -8,13 +8,8 @@
       type="image/x-icon"
     />
 
-    <script src="https://unpkg.com/elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.js"></script>
-    <script>
-      elasticApm.init({
-        serviceName: "tailor",
-        pageLoadTransactionName: "Tailor-Load"
-      });
-    </script>
+    <script src="https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js"></script>
+    <script type="apm-rum"></script>
     <script>
       (function(Pipe, perf) {
         if (Pipe === undefined) {
@@ -25,6 +20,7 @@
         }
         var fragmentMap = Object.create(null);
         var doneGroups = Object.create(null);
+        var transaction = elasticApm.getCurrentTransaction();
 
         function getCount(range) {
           return range[1] - range[0] + 1;
@@ -157,6 +153,7 @@
             perf.measure(measureName, markStart, markEnd);
             // Measure when primary fragment is done
             if (attributes.primary) {
+              transaction.mark("primary-fragment-done");
               perf.measure("primary-done");
             }
             // Measure if fragments assosiated with given timing groups are done
@@ -173,6 +170,7 @@
            * Measure when all the script tags from fragments
            * are done executing on the page
            */
+          transaction.mark("all-fragments-done");
           perf.measure("all-done");
         });
         Pipe.onDone(() => {
@@ -201,11 +199,10 @@
         id="header"
         src="http://localhost:8081"
       ></fragment>
-      <h2>Product/Primary:</h2>
+      <h2>Product:</h2>
       <fragment
         timing-group="interactive"
         id="product"
-        primary
         src="http://localhost:8082"
       ></fragment>
       <h2>Async Footer:</h2>
