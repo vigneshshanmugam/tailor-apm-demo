@@ -9,7 +9,13 @@
     />
 
     <script src="https://unpkg.com/@elastic/apm-rum/dist/bundles/elastic-apm-rum.umd.min.js"></script>
-    <script type="apm-rum"></script>
+    <script>
+      const apm = elasticApm.init({
+        serviceName: "tailor-frontend",
+        pageLoadTransactionName: "/index",
+        serverUrl: "http://localhost:8001"
+      });
+    </script>
     <script>
       (function(Pipe, perf) {
         if (Pipe === undefined) {
